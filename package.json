@@ -4,11 +4,12 @@
   "description": "How to Build a Local Agent",
   "main": "dist/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "Ryan Seddon",
   "license": "MIT",
   "devDependencies": {
+    "@types/dom-chromium-ai": "^0.0.9",
     "@types/node": "^24.1.0",
     "typescript": "^5.8.3"
   }
