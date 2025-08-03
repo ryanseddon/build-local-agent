@@ -1,3 +1,5 @@
+import { extractToolCall } from "./tools.js";
+
 export class Agent {
   constructor(
     private client: LanguageModel,
@@ -15,25 +17,36 @@ export class Agent {
         if (readInput) {
           userInput = await this.getUserMessage();
           console.log(
-            "%cYou:%c " + userInput,
+            "%cYou:%c %s",
             "color: oklch(70.7% .165 254.624)",
             "",
+            userInput,
           );
         }
 
         const result = await this.runInference(userInput);
-        const toolRes = [];
+        let toolRes = "";
+
+        const isToolCall = await extractToolCall(result);
+
+        if (isToolCall) {
+          toolRes = isToolCall;
+        }
 
         console.log(
-          "%cAgent:%c " + result,
+          "%cAgent:%c %s",
           "color: oklch(90.5% .182 98.111)",
           "",
+          result,
         );
 
-        if (toolRes.length === 0) {
+        if (!toolRes) {
           readInput = true;
           continue;
         }
+
+        readInput = false;
+        userInput = toolRes;
       } catch (err: any) {
         if (err.message.includes("User cancelled")) {
           break;

@@ -5,7 +5,36 @@
  * @returns {Promise<string>} A promise that resolves with the files content as a string.
  */
 export async function readFile(path: string): Promise<string> {
-  return Promise.resolve(path);
+  return Promise.resolve("import {fpoo} from 'bar';");
+}
+
+async function prepareToolCall(text: string) {
+  const output = text.replace(
+    /^\s*console\.log\(\s*([a-zA-Z_$][\w$]*)\s*\);?/m,
+    "return $1;",
+  );
+
+  const generatedFn = new Function(
+    "readFile",
+    `return (async function(){ ${output} })();`,
+  );
+
+  const result = await generatedFn(readFile);
+  return `\`\`\`tool_output\n${result}\n\`\`\``;
+}
+
+export async function extractToolCall(text: string) {
+  const match = text.match(/```tool_code\s*([\s\S]*?)\s*```/);
+  const code = match ? match[1] : null;
+
+  if (code) {
+    console.log("%ctool:%c \n%s", "color: oklch(79.2% .209 151.711)", "", code);
+
+    const res = await prepareToolCall(code);
+    return res;
+  }
+
+  return false;
 }
 
 export const systemPrompt: LanguageModelSystemMessage = {
