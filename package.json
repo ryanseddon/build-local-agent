@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "How to Build a Local Agent",
   "main": "dist/main.js",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },

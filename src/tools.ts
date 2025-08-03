@@ -8,13 +8,9 @@ export async function readFile(path: string): Promise<string> {
   return Promise.resolve(path);
 }
 
-export const initialPrompts: [
-  LanguageModelSystemMessage,
-  ...LanguageModelMessage[],
-] = [
-  {
-    role: "system",
-    content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The Typescript methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
+export const systemPrompt: LanguageModelSystemMessage = {
+  role: "system",
+  content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The Typescript methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
  
 The following Typescript methods are available:
  
@@ -29,5 +25,9 @@ async function readFile(path: string): Promise<string> {}
 \`\`\`
  
 User: `,
-  },
-];
+};
+
+export const initialPrompts: [
+  LanguageModelSystemMessage,
+  ...LanguageModelMessage[],
+] = [systemPrompt];
