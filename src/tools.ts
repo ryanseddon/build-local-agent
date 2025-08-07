@@ -1,11 +1,21 @@
-/**
+import { waitForDirAccess } from "./utils.js";
+
+/*
  * Read the contents of a given relative file path. Use this when you want to see what's inside a file. Do not use this with directory names.
  *
  * @param path - The relative path of a file in the working directory.
  * @returns {Promise<string>} A promise that resolves with the files content as a string.
  */
 export async function readFile(path: string): Promise<string> {
-  return Promise.resolve("import {fpoo} from 'bar';");
+  const fileName = path.includes("/") ? path.split("/").reverse()[0] : path;
+  // @ts-ignore
+  const dir = await waitForDirAccess();
+  // @ts-ignore
+  const fileHandle = await dir.getFileHandle(fileName);
+  const file = await fileHandle.getFile();
+  const content = await file.text();
+
+  return content;
 }
 
 async function prepareToolCall(text: string) {

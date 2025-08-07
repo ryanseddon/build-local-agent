@@ -1,20 +1,9 @@
 import { Agent } from "./agent.js";
 import { initialPrompts } from "./tools.js";
-
-function promptAsync(message: string): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const input = prompt(message);
-    if (input === null) {
-      reject(new Error("User cancelled the input"));
-      return;
-    }
-    resolve(input);
-  });
-}
+import { promptAsync } from "./utils.js";
 
 async function getUserMessage(str: string): Promise<string> {
-  const message: string = await promptAsync(str);
-  return message;
+  return await promptAsync(str);
 }
 
 async function main() {

@@ -9,6 +9,7 @@ export class Agent {
   async run() {
     console.log("Chat with On-device LLM (cancel the prompt to quit)");
 
+    const conversation = [];
     let readInput = true;
     let userInput = "";
 
@@ -16,6 +17,7 @@ export class Agent {
       try {
         if (readInput) {
           userInput = await this.getUserMessage();
+          conversation.push(userInput);
           console.log(
             "%cYou:%c %s",
             "color: oklch(70.7% .165 254.624)",
@@ -23,6 +25,8 @@ export class Agent {
             userInput,
           );
         }
+
+        console.log(conversation);
 
         const result = await this.runInference(userInput);
         let toolRes = "";
@@ -33,20 +37,22 @@ export class Agent {
           toolRes = isToolCall;
         }
 
-        console.log(
-          "%cAgent:%c %s",
-          "color: oklch(90.5% .182 98.111)",
-          "",
-          result,
-        );
-
         if (!toolRes) {
           readInput = true;
+          console.log(
+            "%cAgent:%c %s",
+            "color: oklch(90.5% .182 98.111)",
+            "",
+            result,
+          );
+
           continue;
         }
 
         readInput = false;
+        console.log(toolRes);
         userInput = toolRes;
+        conversation.push(toolRes);
       } catch (err: any) {
         if (err.message.includes("User cancelled")) {
           break;
@@ -58,6 +64,7 @@ export class Agent {
   }
 
   async runInference(message: string): Promise<string> {
+    console.log(this.client);
     return this.client.prompt(message);
   }
 }
