@@ -41,7 +41,11 @@ async function prepareToolCall(text: string) {
     .replace(/^\s*console\.log\(\s*([a-zA-Z_$][\w$]*)\s*\);?/m, "return $1;")
     .replace(/^const\s+\w+\s*=\s*(await\s+\w+\([^)]*\));\s*$/m, "return $1;")
     .replace(/^\s*(await\s+\w+\([^)]*\));\s*$/m, "return $1;");
-  const generatedFn = new Function(`return (async function(){ ${output} })();`);
+  const generatedFn = new Function(
+    "readFile",
+    "listFiles",
+    `return (async function(){ ${output} })();`,
+  );
   const result = await generatedFn(readFile, listFiles);
 
   return "```tool_output\n" + result + "\n```";
