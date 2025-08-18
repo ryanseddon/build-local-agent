@@ -18,4 +18,4 @@ async function main() {
   return agent.run();
 }
 
-main();
+document.querySelector("#start")?.addEventListener("click", () => main());

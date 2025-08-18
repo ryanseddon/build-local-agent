@@ -7,6 +7,52 @@
   </head>
   <body>
     <button id="openBtn">grant access to a directory</button>
+    <button id="start">Start Agent</button>
+    <p>Open the console before clicking start</p>
+    <details>
+      <summary>Setup Instructions</summary>
+      <ol>
+        <li>
+          **Install Chrome Canary**: Ensure you have version 141. [Download
+          Chrome Canary](https://google.com/chrome/canary/).
+        </li>
+        <li>Check that you’re on 141.0.7362.0 or above</li>
+        <li>
+          Enable two flags:
+          <ul>
+            <li>
+              chrome://flags/#optimization-guide-on-device-model -
+              BypassPerfRequirement
+            </li>
+            <li>chrome://flags/#prompt-api-for-gemini-nano - Enabled</li>
+          </ul>
+        </li>
+        <li>Relaunch Chrome</li>
+        <li>Navigate to chrome://components</li>
+        <li>
+          Check that Optimization Guide On Device Model is downloading or force
+          download if not Might take a few minutes for this component to even
+          appear
+        </li>
+        <li>
+          Open dev tools and type `(await
+          LanguageModel.capabilities()).available`, should return "readily" when
+          all good
+        </li>
+        <li>
+          If not you can trigger the download by doing the follow: ```const
+          session = await LanguageModel.create({monitor(m)
+          {m.addEventListener("downloadprogress", e => { console.log(`Downloaded
+          \${e.loaded} of \${e.total} bytes.`); });}});```
+        </li>
+        <li>
+          <a href="https://ryanseddon.com/ai/how-to-build-an-agent-on-device/"
+            >Read the article</a
+          >.
+        </li>
+      </ol>
+    </details>
+
     <script type="module" src="dist/main.js"></script>
   </body>
 </html>
