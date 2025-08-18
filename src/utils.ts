@@ -46,20 +46,22 @@ function waitForClick(button: HTMLElement): Promise<void> {
 }
 
 export async function waitForDirAccess() {
-  const btn = document.querySelector("#openBtn");
-  console.log(
-    "%ctool:%c You need to click the button to grant access to the directory",
-    "color: oklch(79.2% .209 151.711)",
-    "",
-  );
+  if (cachedDirHandle === null) {
+    const btn = document.querySelector("#openBtn");
+    console.log(
+      "%ctool:%c You need to click the button to grant access to the directory",
+      "color: oklch(79.2% .209 151.711)",
+      "",
+    );
 
-  // @ts-ignore
-  await waitForClick(btn);
+    // @ts-ignore
+    await waitForClick(btn);
+  }
 
   return await getDir();
 }
 
-export function promptAsync(message: string): Promise<string> {
+export async function promptAsync(message: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const input = prompt(message);
     if (input === null) {

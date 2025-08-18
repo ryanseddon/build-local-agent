@@ -1,27 +1,28 @@
 const getUserMessage = async (str) =>
   new Promise((resolve) => resolve(prompt(str)));
 
-async function waitForClick(button) {
-  return new Promise((resolve) => {
+const waitForClick = (button) =>
+  new Promise((resolve) => {
     const handler = () => {
       button.removeEventListener("click", handler);
       resolve();
     };
     button.addEventListener("click", handler);
   });
-}
 
 async function waitForDirAccess() {
-  const btn = document.querySelector("#fsAccess");
-  console.log(
-    "%ctool:%c You need to click the button to grant access to the directory",
-    "color: oklch(79.2% .209 151.711)",
-    "",
-  );
+  if (cachedDirHandle === null) {
+    const btn = document.querySelector("#fsAccess");
+    console.log(
+      "%ctool:%c You need to click the button to grant access to the directory",
+      "color: oklch(79.2% .209 151.711)",
+      "",
+    );
 
-  await waitForClick(btn);
+    await waitForClick(btn);
+  }
 
-  return await getDir();
+  return getDir();
 }
 
 async function readFile(path) {
@@ -73,18 +74,19 @@ async function getDir() {
 }
 
 async function prepareToolCall(text) {
-  const output = text.replace(
-    /^\s*console\.log\(\s*([a-zA-Z_$][\w$]*)\s*\);?/m,
-    "return $1;",
-  );
+  const output = text
+    .replace(/^\s*console\.log\(\s*([a-zA-Z_$][\w$]*)\s*\);?/m, "return $1;")
+    .replace(/^const\s+\w+\s*=\s*(await\s+\w+\([^)]*\));\s*$/m, "return $1;")
+    .replace(/^\s*(await\s+\w+\([^)]*\));\s*$/m, "return $1;");
   const generatedFn = new Function(`return (async function(){ ${output} })();`);
   const result = await generatedFn(readFile);
-  return `\`\`\`tool_output\n${result}\n\`\`\``;
+
+  return "```tool_output\n" + result + "\n```";
 }
 
 async function extractToolCall(text) {
   const match = text.match(/```tool_code\s*([\s\S]*?)\s*```/);
-  const code = match ? match[1] : null;
+  const code = match?.[1] || null;
   if (code) {
     console.log("%ctool:%c \n%s", "color: oklch(79.2% .209 151.711)", "", code);
     const res = await prepareToolCall(code);
@@ -100,7 +102,7 @@ const client = await LanguageModel.create({
   initialPrompts: [
     {
       role: "system",
-      content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The Typescript methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
+      content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The Typescript methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_code\`\`\` think step by step why and how it should be used.
  
 The following Typescript methods are available:
  
@@ -116,7 +118,7 @@ async function readFile(path: string): Promise<string> {}
  
 \`\`\`js
 /**
- * List files at a given path. If no path is provided, lists files in the current directory.
+ * List files of a directory that the user will grant permission too. All you're concerned with is calling this to get access to a directory and its files.
  *
  * @returns {Promise<string[]>} A promise that resolves with the array of file names.
  */
@@ -143,6 +145,9 @@ class Agent {
     while (true) {
       if (readInput) {
         userInput = await this.getUserMessage();
+
+        if (userInput === null) break;
+
         console.log(
           "%cYou:%c %s",
           "color: oklch(70.7% .165 254.624)",
@@ -173,6 +178,7 @@ class Agent {
 
       readInput = false;
       userInput = toolRes;
+      console.log(userInput);
     }
   }
 
