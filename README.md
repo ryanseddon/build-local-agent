@@ -5,7 +5,7 @@ This repository contains the code to build and run a local AI agent directly in 
 > [!IMPORTANT]
 > This requires Chrome Canary or Edge Dev with the following flags enabled.
 
-Try it here: https://ai.ryanseddon.com/build-local-agent/
+Try it here: <https://ai.ryanseddon.com/build-local-agent/>
 
 <details>
   <summary>Setup Instructions</summary>
@@ -30,7 +30,7 @@ Try it here: https://ai.ryanseddon.com/build-local-agent/
   </ol>
 </details>
 
-![](screenshot.png)
+![](screenshot.jpg)
 
 This is an attempt to get the [How to Build an Agent](https://ampcode.com/how-to-build-an-agent) article working in the browser using the Gemini Nano and Phi-4-mini in Chrome and Edge respectively.
 
