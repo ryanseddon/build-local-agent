@@ -28,6 +28,8 @@ This repository contains the code to build and run a local AI agent directly in 
   </ol>
 </details>
 
+![](screenshot.png)
+
 This is an attempt to get the [How to Build an Agent](https://ampcode.com/how-to-build-an-agent) article working in the browser using the Gemini Nano and Phi-4-mini in Chrome and Edge respectively.
 
 Read the [How to build an Agent, On-Device Edition](https://ryanseddon.com/ai/how-to-build-an-agent-on-device/).
