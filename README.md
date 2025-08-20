@@ -5,6 +5,8 @@ This repository contains the code to build and run a local AI agent directly in 
 > [!IMPORTANT]
 > This requires Chrome Canary or Edge Dev with the following flags enabled.
 
+Try it here: https://ai.ryanseddon.com/build-local-agent/
+
 <details>
   <summary>Setup Instructions</summary>
   <ol>
