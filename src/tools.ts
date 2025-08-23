@@ -65,13 +65,50 @@ export async function extractToolCall(text: string) {
   return false;
 }
 
+export const responseConstraint = {
+  type: "object",
+  properties: {
+    mode: {
+      type: "string",
+      enum: ["message", "tool_call"],
+      description:
+        "Indicates whether this is a plain message or a request to call a tool.",
+    },
+    message: {
+      type: "string",
+      description: "The message text to send if mode=message.",
+    },
+    tool: {
+      type: "string",
+      enum: ["readFile"],
+      description: "Available tools: readFile(path: string)",
+    },
+    parameters: {
+      type: "object",
+      description:
+        "Key-value arguments for the tool, only used if mode=tool_call.",
+    },
+  },
+  required: ["mode"],
+};
+
 export const systemPrompt: LanguageModelSystemMessage = {
   role: "system",
-  content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The Typescript methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_code\`\`\` think step by step why and how it should be used.
- 
-The following Typescript methods are available:
- 
-\`\`\`js
+  content: `You can respond in two modes:
+
+1. Message mode
+   Use when replying directly to the user.
+   Example:
+   {
+     "mode": "message",
+     "message": "Hello! How can I help you?"
+   }
+
+2. Tool mode
+   Use ONLY when you actually need to call a tool to answer the request. I can give you access to things so don't assume you can't read file system or get other device access.
+
+Available tool:
+
 /**
  * Read the contents of a given relative file path. Use this when you want to see what's inside a file. Do not use this with directory names.
  *
@@ -79,21 +116,59 @@ The following Typescript methods are available:
  * @returns {Promise<string>} A promise that resolves with the files content as a string.
  */
 async function readFile(path: string): Promise<string> {}
-\`\`\`
- 
-\`\`\`js
+
 /**
  * List files of a directory that the user will grant permission too. All you're concerned with is calling this to get access to a directory and its files.
  *
  * @returns {Promise<string[]>} A promise that resolves with the array of file names.
  */
 async function listFiles(): Promise<string[]> {}
-\`\`\`
- 
-User: `,
+
+Rules:
+- Default to "message" unless calling the tool is absolutely necessary.
+- Do not call a tool for greetings, small talk, or when the answer is already known.
+- Use EXACTLY the parameter name and type shown in the signature.`,
 };
 
 export const initialPrompts: [
   LanguageModelSystemMessage,
   ...LanguageModelMessage[],
-] = [systemPrompt];
+] = [
+  systemPrompt,
+  // {
+  //   role: "user",
+  //   content: "What's in notes.txt",
+  // },
+  // {
+  //   role: "assistant",
+  //   content:
+  //     '{"mode": "tool_call", "tool": "readFile", "parameters": {"path": "notes.txt"}}',
+  // },
+  // {
+  //   role: "user",
+  //   content:
+  //     "Get resposneContraints working instead of a fairly reliable, yet not always, system prompt code fence example with regexp parsing brittleness.",
+  // },
+  // {
+  //   role: "assistant",
+  //   content:
+  //     "The file notes.txt talks about using responseContraint over a system prompt to get relliable format back over regexp and parsing text",
+  // },
+  // {
+  //   role: "user",
+  //   content: "What's in the dir?",
+  // },
+  // {
+  //   role: "assistant",
+  //   content: '{"mode": "tool_call", "tool": "listFiles"}',
+  // },
+  // {
+  //   role: "user",
+  //   content: "['file1.csv','tools.ts','things.txt']",
+  // },
+  // {
+  //   role: "assistant",
+  //   content:
+  //     "The directory contains 3 files:\n\n- file1.csv\n-tools.ts\n-things.txt",
+  // },
+];

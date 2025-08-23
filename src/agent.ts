@@ -1,4 +1,4 @@
-import { extractToolCall } from "./tools.js";
+import { extractToolCall, responseConstraint } from "./tools.js";
 
 export class Agent {
   constructor(
@@ -60,6 +60,6 @@ export class Agent {
 
   async runInference(message: string): Promise<string> {
     console.log(this.client);
-    return this.client.prompt(message);
+    return this.client.prompt(message, { responseConstraint });
   }
 }
